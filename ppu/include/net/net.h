@@ -1,9 +1,15 @@
 #ifndef __LV2_NET_H__
 #define __LV2_NET_H__
 
-#include <net/socket.h>
-#include <net/select.h>
-#include <net/poll.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <net_init.h>
+#include <socket.h>
+#include <poll.h>
+#include <netdb.h>
+#include <netinet/in.h>
 
 #define	NET_EPERM			1
 #define	NET_ENOENT			2
@@ -103,79 +109,60 @@
 #define net_errno			(*netErrnoLoc())
 #define net_h_errno			(*netHErrnoLoc())
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct net_msghdr
+struct netInitParam
 {
-	u32 _pad0;
-	u32 msg_name;
-	socklen_t msg_namlen;
-	u32 _pad1;
-	u32 _pad2;
-	u32 msg_iov;
-	s32 msg_iovlen;
-	u32 _pad3;
-	u32 _pad4;
-	u32 msg_control;
-	socklen_t msg_controllen;
-	s32 msg_flags;
+	uint32_t memory;
+	uint32_t memory_size;
+	int32_t flags;
 };
 
-struct net_hostent
-{
-	u32 h_name;
-	u32 h_aliases;
-	s32 h_addrtype;
-	s32 h_length;
-	u32 h_addr_list;
-};
+int32_t netInitialize();
+int32_t netDeinitialize();
 
-typedef struct _net_init_param
-{
-	u32 memory;
-	u32 memory_size;
-	s32 flags;
-} netInitParam;
+int32_t* netErrnoLoc();
+int32_t* netHErrnoLoc();
 
-s32 netInitialize();
-s32 netDeinitialize();
+int32_t netInitializeNetworkEx(struct netInitParam* param);
+int32_t netFinalizeNetwork();
+int32_t netShowIfConfig();
+int32_t netShowNameServer();
+int32_t netShowRoute();
 
-s32* netErrnoLoc();
-s32* netHErrnoLoc();
+int32_t netAccept(int32_t socket,const struct sockaddr* address,socklen_t* address_len);
+int32_t netBind(int32_t socket,const struct sockaddr* address,socklen_t address_len);
+int32_t netConnect(int32_t socket,const struct sockaddr* address,socklen_t address_len);
+int32_t netListen(int32_t socket,int32_t backlog);
+int32_t netSocket(int32_t domain,int32_t type,int32_t protocol);
+int32_t netClose(int32_t socket);
+int32_t netShutdown(int32_t socket,int32_t how);
 
-s32 netInitializeNetworkEx(netInitParam* param);
-s32 netFinalizeNetwork();
-s32 netShowIfConfig();
-s32 netShowNameServer();
-s32 netShowRoute();
+ssize_t netRecv(int32_t socket,void *buffer,size_t len,int32_t flags);
+ssize_t netRecvFrom(int32_t socket,void *buffer,size_t len,int32_t flags,struct sockaddr* from,socklen_t* fromlen);
+ssize_t netRecvMsg(int32_t socket,struct msghdr *msg,int32_t flags);
+ssize_t netSend(int32_t socket,const void *buffer,size_t len,int32_t flags);
+ssize_t netSendTo(int32_t socket,const void *buffer,size_t len,int32_t flags,const struct sockaddr* dest_addr,socklen_t dest_len);
+ssize_t netSendMsg(int32_t socket,const struct msghdr *msg,int32_t flags);
 
-s32 netAccept(s32 socket,const struct sockaddr* address,socklen_t* address_len);
-s32 netBind(s32 socket,const struct sockaddr* address,socklen_t address_len);
-s32 netConnect(s32 socket,const struct sockaddr* address,socklen_t address_len);
-s32 netListen(s32 socket,s32 backlog);
-s32 netSocket(s32 domain,s32 type,s32 protocol);
-s32 netClose(s32 socket);
-s32 netShutdown(s32 socket,s32 how);
+int32_t netPoll(struct pollfd *fds,nfds_t nfds,int32_t timeout);
+int32_t netSelect(int32_t nfds,fd_set *readfds,fd_set *writefds,fd_set *errorfds,struct timeval *timeout);
+int32_t netGetSockName(int32_t socket,struct sockaddr *address,socklen_t *address_len);
+int32_t netGetPeerName(int32_t socket,struct sockaddr *address,socklen_t *address_len);
 
-ssize_t netRecv(s32 socket,void *buffer,size_t len,s32 flags);
-ssize_t netRecvFrom(s32 socket,void *buffer,size_t len,s32 flags,struct sockaddr* from,socklen_t* fromlen);
-ssize_t netRecvMsg(s32 socket,struct net_msghdr *msg,s32 flags);
-ssize_t netSend(s32 socket,const void *buffer,size_t len,s32 flags);
-ssize_t netSendTo(s32 socket,const void *buffer,size_t len,s32 flags,const struct sockaddr* dest_addr,socklen_t dest_len);
-ssize_t netSendMsg(s32 socket,const struct net_msghdr *msg,s32 flags);
+int32_t netGetSockOpt(int32_t socket,int32_t level,int32_t option_name,void *option_value,socklen_t *option_len);
+int32_t netSetSockOpt(int32_t socket,int32_t level,int32_t option_name,const void *option_value,socklen_t option_len);
 
-s32 netPoll(struct pollfd *fds,nfds_t nfds,s32 timeout);
-s32 netSelect(s32 nfds,fd_set *readfds,fd_set *writefds,fd_set *errorfds,struct timeval *timeout);
-s32 netGetSockName(s32 socket,struct sockaddr *address,socklen_t *address_len);
-s32 netGetPeerName(s32 socket,struct sockaddr *address,socklen_t *address_len);
+struct hostent * netGetHostByAddr(const char *addr,socklen_t len,int32_t type);
+struct hostent * netGetHostByName(const char *name);
 
-s32 netGetSockOpt(s32 socket,s32 level,s32 option_name,void *option_value,socklen_t *option_len);
-s32 netSetSockOpt(s32 socket,s32 level,s32 option_name,const void *option_value,socklen_t option_len);
-
-struct net_hostent* netGetHostByAddr(const char *addr,socklen_t len,s32 type);
-struct net_hostent* netGetHostByName(const char *name);
+in_addr_t netInetAddr(const char* cp);
+int netInetAton(const char* cp, struct in_addr* inp);
+in_addr_t netInetLnaof(struct in_addr in);
+struct in_addr netInetMakeaddr(in_addr_t net, in_addr_t lna);
+in_addr_t netInetNetof(struct in_addr in);
+in_addr_t netInetNetwork(const char* cp);
+char * netInetNtoa(struct in_addr in);
+const char * netInetNtop(int af, const void* src, char* dst, socklen_t size);
+int netInetPton(int af, const char* src, void* dst);
 
 #ifdef __cplusplus
 	}
