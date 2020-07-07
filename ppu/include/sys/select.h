@@ -20,7 +20,6 @@ extern "C" {
 #endif
 
 int select(int, fd_set*, fd_set*, fd_set*, struct timeval*);
-int pselect(int, fd_set*, fd_set*, fd_set*, const struct timespec*, const sigset_t*);
 
 #ifdef __cplusplus
 	}

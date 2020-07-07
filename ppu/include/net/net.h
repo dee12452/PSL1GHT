@@ -1,9 +1,10 @@
 #ifndef __NET_H__
 #define __NET_H__
 
-#include <socket.h>
+#include <netdb.h>
 #include <select.h>
 #include <poll.h>
+#include <netinet/in.h>
 
 #define	NET_EPERM			1
 #define	NET_ENOENT			2
@@ -103,31 +104,6 @@
 #define net_errno			(*netErrnoLoc())
 #define net_h_errno			(*netHErrnoLoc())
 
-struct net_msghdr
-{
-	u32 _pad0;
-	u32 msg_name;
-	socklen_t msg_namlen;
-	u32 _pad1;
-	u32 _pad2;
-	u32 msg_iov;
-	s32 msg_iovlen;
-	u32 _pad3;
-	u32 _pad4;
-	u32 msg_control;
-	socklen_t msg_controllen;
-	s32 msg_flags;
-};
-
-struct net_hostent
-{
-	u32 h_name;
-	u32 h_aliases;
-	s32 h_addrtype;
-	s32 h_length;
-	u32 h_addr_list;
-};
-
 typedef struct _net_init_param
 {
 	u32 memory;
@@ -161,10 +137,10 @@ s32 netShutdown(s32 socket,s32 how);
 
 ssize_t netRecv(s32 socket,void *buffer,size_t len,s32 flags);
 ssize_t netRecvFrom(s32 socket,void *buffer,size_t len,s32 flags,struct sockaddr* from,socklen_t* fromlen);
-ssize_t netRecvMsg(s32 socket,struct net_msghdr *msg,s32 flags);
+ssize_t netRecvMsg(s32 socket,struct msghdr *msg,s32 flags);
 ssize_t netSend(s32 socket,const void *buffer,size_t len,s32 flags);
 ssize_t netSendTo(s32 socket,const void *buffer,size_t len,s32 flags,const struct sockaddr* dest_addr,socklen_t dest_len);
-ssize_t netSendMsg(s32 socket,const struct net_msghdr *msg,s32 flags);
+ssize_t netSendMsg(s32 socket,const struct msghdr *msg,s32 flags);
 
 s32 netPoll(struct pollfd *fds,nfds_t nfds,s32 timeout);
 s32 netSelect(s32 nfds,fd_set *readfds,fd_set *writefds,fd_set *errorfds,struct timeval *timeout);
@@ -174,8 +150,18 @@ s32 netGetPeerName(s32 socket,struct sockaddr *address,socklen_t *address_len);
 s32 netGetSockOpt(s32 socket,s32 level,s32 option_name,void *option_value,socklen_t *option_len);
 s32 netSetSockOpt(s32 socket,s32 level,s32 option_name,const void *option_value,socklen_t option_len);
 
-struct net_hostent* netGetHostByAddr(const char *addr,socklen_t len,s32 type);
-struct net_hostent* netGetHostByName(const char *name);
+struct hostent* netGetHostByAddr(const char *addr,socklen_t len,s32 type);
+struct hostent* netGetHostByName(const char *name);
+
+in_addr_t netInetAddr(const char* cp);
+in_addr_t netInetLnaof(struct in_addr in);
+struct in_addr netInetMakeaddr(in_addr_t net, in_addr_t lna);
+in_addr_t netInetNetof(struct in_addr in);
+in_addr_t netInetNetwork(const char* cp);
+char* netInetNtoa(struct in_addr in);
+int netInetAton(const char* cp, struct in_addr* inp);
+const char* netInetNtop(int af, const void* src, char* dst, socklen_t size);
+int netInetPton(int af, const char* src, void* dst);
 
 #ifdef __cplusplus
 	}

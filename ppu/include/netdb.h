@@ -53,7 +53,6 @@ struct hostent
 	#define h_addr h_addr_list[0]
 };
 
-
 struct servent
 {
   char *s_name;                 /* Official service name.  */
