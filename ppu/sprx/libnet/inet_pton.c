@@ -1,4 +1,5 @@
 #include "init.h"
+#include <net/net.h>
 #include <arpa/inet.h>
 #include <sys/lv2errno.h>
 
@@ -9,6 +10,7 @@ int inet_pton(int af, const char* src, void* dst)
         errno = ENOSYS;
         return -1;
     }
+
     switch(af)
     {
         case AF_INET:
@@ -16,9 +18,9 @@ int inet_pton(int af, const char* src, void* dst)
         case AF_INET6:
             /* TODO: Implement support for IPV6 */
             errno = EAFNOSUPPORT;
-            return NULL;
+            return -1;
         default:
             errno = EAFNOSUPPORT;
-            return NULL;
+            return -1;
     }
 }

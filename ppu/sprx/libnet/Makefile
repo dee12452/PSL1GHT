@@ -30,6 +30,9 @@ export SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
 export OFILES		:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 						$(sFILES:.s=.o) $(SFILES:.S=.o)
 
+export NETOFILES	:= init.o socket.o select.o poll.o gethostbyaddr.o gethostbyname.o getservbyport.o inet_addr.o \
+						inet_aton.o inet_lnaof.o inet_makeaddr.o inet_netof.o inet_network.o inet_ntoa.o inet_ntop.o inet_pton.o
+
 export VPATH		:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir))
 
 export INCLUDE		:=	$(foreach dir,$(INCLUDES), -iquote $(CURDIR)/$(dir)) \
@@ -76,7 +79,7 @@ install: all
 	@cp -frv $(CURDIR)/lib/ppu/*.a $(PSL1GHT)/ppu/lib
 
 #---------------------------------------------------------------------------------
-$(LIBRARY).a: sprx.o init.o socket.o
+$(LIBRARY).a: sprx.o $(NETOFILES)
 #---------------------------------------------------------------------------------
 
 .PHONY: lib ppu install

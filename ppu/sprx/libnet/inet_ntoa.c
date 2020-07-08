@@ -1,4 +1,5 @@
 #include "init.h"
+#include <net/net.h>
 #include <arpa/inet.h>
 #include <sys/lv2errno.h>
 

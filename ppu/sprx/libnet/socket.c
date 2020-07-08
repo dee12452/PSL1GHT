@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <socket.h>
+#include <net/net.h>
 #include <sys/lv2errno.h>
 
 int accept(int socket, struct sockaddr* address, socklen_t* address_len)

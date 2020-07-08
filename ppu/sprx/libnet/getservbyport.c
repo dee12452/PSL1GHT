@@ -1,5 +1,7 @@
 #include "init.h"
+#include <string.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 #include <sys/lv2errno.h>
 
 /***********************************************************
@@ -34,61 +36,6 @@ struct pvt_servent {
   unsigned short  s_port;
   char           *s_proto;
 };
-
-static struct pvt_servent IANAports[];
-
-struct servent * getservbyport(int port, const char *proto)
-{
-    if(!LIBNET_INITIALZED)
-    {
-        errno = ENOSYS;
-        return NULL;
-    }
-    
-    unsigned short u_port;
-    const char *protocol = NULL;
-    int i;
-    u_port = ntohs((unsigned short)port);
-
-    errno = 0;
-    if (proto)
-    {
-        switch (strlen(proto)) {
-        case 3:
-        if (!strncasecmp(proto, "tcp", 3))
-            protocol = "tcp";
-        else if (!strncasecmp(proto, "udp", 3))
-            protocol = "udp";
-        else
-            errno = ENOSYS;
-        break;
-        case 4:
-        if (!strncasecmp(proto, "sctp", 4))
-            protocol = "sctp";
-        else if (!strncasecmp(proto, "dccp", 4))
-            protocol = "dccp";
-        else
-            errno = ENOSYS;
-        break;
-        default:
-        errno = ENOSYS;
-        }
-    }
-
-    if (!errno)
-    {
-        for (i = 0; i < (sizeof(IANAports) / sizeof(IANAports[0])) - 1; i++)
-        {
-            if (u_port == IANAports[i].s_port)
-            {
-                if (!protocol || !strcasecmp(protocol, IANAports[i].s_proto))
-                return (struct servent *)&IANAports[i];
-            }
-        }
-    }
-
-    return NULL;
-}
 
 /*
  * Ref: http://www.iana.org/assignments/port-numbers
@@ -10991,3 +10938,56 @@ static struct pvt_servent IANAports[] = {
 #endif /* USE_IANA_REGISTERED_PORTS */
 { NULL,                NULL, 0, NULL }
 };
+
+struct servent * getservbyport(int port, const char *proto)
+{
+    if(!LIBNET_INITIALZED)
+    {
+        errno = ENOSYS;
+        return NULL;
+    }
+    
+    unsigned short u_port;
+    const char *protocol = NULL;
+    int i;
+    u_port = ntohs((unsigned short)port);
+
+    errno = 0;
+    if (proto)
+    {
+        switch (strlen(proto)) {
+        case 3:
+        if (!strncasecmp(proto, "tcp", 3))
+            protocol = "tcp";
+        else if (!strncasecmp(proto, "udp", 3))
+            protocol = "udp";
+        else
+            errno = ENOSYS;
+        break;
+        case 4:
+        if (!strncasecmp(proto, "sctp", 4))
+            protocol = "sctp";
+        else if (!strncasecmp(proto, "dccp", 4))
+            protocol = "dccp";
+        else
+            errno = ENOSYS;
+        break;
+        default:
+        errno = ENOSYS;
+        }
+    }
+
+    if (!errno)
+    {
+        for (i = 0; i < (sizeof(IANAports) / sizeof(IANAports[0])) - 1; i++)
+        {
+            if (u_port == IANAports[i].s_port)
+            {
+                if (!protocol || !strcasecmp(protocol, IANAports[i].s_proto))
+                return (struct servent *)&IANAports[i];
+            }
+        }
+    }
+
+    return NULL;
+}

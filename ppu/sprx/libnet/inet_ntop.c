@@ -1,4 +1,5 @@
 #include "init.h"
+#include <net/net.h>
 #include <arpa/inet.h>
 #include <sys/lv2errno.h>
 
@@ -7,8 +8,9 @@ const char * inet_ntop(int af, const void* src, char* dst, socklen_t size)
     if(!LIBNET_INITIALZED)
     {
         errno = ENOSYS;
-        return (in_addr_t) -1;
+        return (char *) NULL;
     }
+    
     switch(af)
     {
         case AF_INET:
@@ -16,9 +18,9 @@ const char * inet_ntop(int af, const void* src, char* dst, socklen_t size)
         case AF_INET6:
             /* TODO: Implement support for IPV6 */
             errno = EAFNOSUPPORT;
-            return NULL;
+            return (char *) NULL;
         default:
             errno = EAFNOSUPPORT;
-            return NULL;
+            return (char *) NULL;
     }
 }
