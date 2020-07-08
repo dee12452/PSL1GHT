@@ -5,7 +5,8 @@
 
 #define LIBNET_MEMORY_SIZE			0x20000 // 128KB
 
-void* __netMemory;
+extern void* __netMemory;
+
 #define LIBNET_INITIALZED	(__netMemory)
 
 #ifdef __cplusplus

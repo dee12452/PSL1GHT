@@ -1,15 +1,16 @@
-#include "init.h"
+#ifndef __LINUX_ERRNO_EXTENSIONS__
+#define __LINUX_ERRNO_EXTENSIONS__
+#endif
 
+#include <errno.h>
+#include "init.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <net/net.h>
 #include <sysmodule/sysmodule.h>
 
-#define __LINUX_ERRNO_EXTENSIONS__
-#include <errno.h>
-
-extern void* __netMemory = NULL;
+void* __netMemory = NULL;
 
 s32 netInitialize()
 {
